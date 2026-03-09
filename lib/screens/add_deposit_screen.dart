@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
+
 class AddDepositScreen extends StatefulWidget {
   const AddDepositScreen({super.key});
 
@@ -8,25 +9,39 @@ class AddDepositScreen extends StatefulWidget {
 }
 
 class _AddDepositScreenState extends State<AddDepositScreen> {
-
   final _formKey = GlobalKey<FormState>();
 
   final bankController = TextEditingController();
   final accountController = TextEditingController();
   final amountController = TextEditingController();
 
+  List<String> banks = ["TGGVB", "BOB", "Cherukuri"];
+
+  String? selectedBank;
+
+  List<String> names = [
+    "Narayana & Sowmya",
+    "Narayana & Sunitha",
+    "Narayana & Saiteja",
+    "Narayana",
+    "Saiteja",
+    "Neha",
+  ];
+
+  String? selectedName;
+  final interestController = TextEditingController();
+  double yearlyInterest = 0;
   DateTime? startDate;
   DateTime? maturityDate;
 
   String depositType = "FD";
 
   Future<void> pickDate(BuildContext context, bool isStartDate) async {
-
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      firstDate: DateTime(2015),
+      lastDate: DateTime(2050),
     );
 
     if (picked != null) {
@@ -40,13 +55,20 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
     }
   }
 
+  void calculateInterest() {
+    double principal = double.tryParse(amountController.text) ?? 0;
+
+    double rate = double.tryParse(interestController.text) ?? 0;
+
+    setState(() {
+      yearlyInterest = (principal * rate) / 100;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Add Deposit"),
-      ),
+      appBar: AppBar(title: const Text("Add Deposit")),
 
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -56,7 +78,6 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
 
           child: ListView(
             children: [
-
               Card(
                 elevation: 3,
                 child: Padding(
@@ -64,15 +85,26 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
 
                   child: Column(
                     children: [
-
-                      TextFormField(
-                        controller: bankController,
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedBank,
                         decoration: const InputDecoration(
                           labelText: "Bank Name",
+                          border: OutlineInputBorder(),
                         ),
+                        items: banks.map((bank) {
+                          return DropdownMenuItem(
+                            value: bank,
+                            child: Text(bank),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedBank = value;
+                          });
+                        },
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Enter bank name";
+                          if (value == null) {
+                            return "Please select bank";
                           }
                           return null;
                         },
@@ -80,14 +112,26 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
 
                       const SizedBox(height: 16),
 
-                      TextFormField(
-                        controller: accountController,
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedName,
                         decoration: const InputDecoration(
-                          labelText: "Account Number",
+                          labelText: "Depositor Name",
+                          border: OutlineInputBorder(),
                         ),
+                        items: names.map((name) {
+                          return DropdownMenuItem(
+                            value: name,
+                            child: Text(name),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedName = value;
+                          });
+                        },
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Enter account number";
+                          if (value == null) {
+                            return "Please select name";
                           }
                           return null;
                         },
@@ -114,11 +158,34 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                       const SizedBox(height: 16),
 
                       TextFormField(
-                        controller: amountController,
+                        controller: interestController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: "Amount",
+                          labelText: "Interest % per year",
+                          border: OutlineInputBorder(),
                         ),
+                        onChanged: (value) {
+                          calculateInterest();
+                        },
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      Text(
+                        "Interest per year: ₹${yearlyInterest.toStringAsFixed(2)}",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      TextFormField(
+                        controller: amountController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: "Amount"),
+                        onChanged: (value) {
+                          calculateInterest();
+                        },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Enter amount";
@@ -130,7 +197,7 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                       const SizedBox(height: 20),
 
                       ListTile(
-                        title: const Text("Start Date"),
+                        title: const Text("Start Date *"),
                         subtitle: Text(
                           startDate == null
                               ? "Select date"
@@ -141,7 +208,7 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                       ),
 
                       ListTile(
-                        title: const Text("Maturity Date"),
+                        title: const Text("Maturity Date *"),
                         subtitle: Text(
                           maturityDate == null
                               ? "Select date"
@@ -159,38 +226,83 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              if (selectedBank == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Please select a bank"),
+                                  ),
+                                );
+                                return;
+                              }
 
-                              double? amount = double.tryParse(amountController.text);
+                              if (selectedName == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Please select a name"),
+                                  ),
+                                );
+                                return;
+                              }
+                              double? amount = double.tryParse(
+                                amountController.text,
+                              );
 
                               if (amount == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Invalid amount")),
+                                  const SnackBar(
+                                    content: Text("Invalid amount"),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (startDate == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Please select start date"),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (maturityDate == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Please select maturity date",
+                                    ),
+                                  ),
                                 );
                                 return;
                               }
 
                               try {
-
                                 await DatabaseHelper.instance.insertDeposit({
-                                  'bankName': bankController.text,
-                                  'username': accountController.text,
+                                  'bankName': selectedBank,
+                                  'depositor': selectedName,
                                   'depositType': depositType,
                                   'amount': amount,
                                   'startDate': startDate?.toString(),
+                                  'interestRate': interestController.text,
+                                  'yearlyInterest': yearlyInterest,
                                   'maturityDate': maturityDate?.toString(),
                                 });
 
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Deposit Saved")),
+                                  const SnackBar(
+                                    content: Text("Deposit Saved"),
+                                  ),
                                 );
 
                                 Navigator.pop(context);
-
                               } catch (e, stackTrace) {
-
                                 if (e.toString().contains("UNIQUE")) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Duplicate deposit not allowed")),
+                                    const SnackBar(
+                                      content: Text(
+                                        "Duplicate deposit not allowed",
+                                      ),
+                                    ),
                                   );
                                 } else {
                                   print(e);
@@ -199,21 +311,16 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                                     SnackBar(content: Text("Error: $e")),
                                   );
                                 }
-
                               }
-
                             }
-
                           },
                           child: const Text("Save Deposit"),
                         ),
-                      )
-
+                      ),
                     ],
                   ),
                 ),
-              )
-
+              ),
             ],
           ),
         ),
