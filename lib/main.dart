@@ -116,21 +116,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             const SizedBox(height: 30),
-
-            ElevatedButton(
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AddDepositScreen()),
-                );
-
-                loadTotals();
-              },
-              child: const Text("Add Deposit"),
-            ),
-
-            const SizedBox(height: 10),
-
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -142,6 +127,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddDepositScreen()),
+          );
+
+          loadTotals();
+        },
       ),
     );
   }
