@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'database/database_helper.dart';
 import 'screens/add_deposit_screen.dart';
 import 'screens/view_deposits_screen.dart';
+import 'services/excel_import_service.dart';
 
 void main() {
   runApp(const DepositTrackerApp());
@@ -124,6 +125,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               child: const Text("View Deposits"),
+            ),
+
+            ElevatedButton(
+              onPressed: () async {
+                await importExcelDeposits();
+                loadTotals();
+              },
+              child: const Text("Import Excel Deposits"),
             ),
           ],
         ),
