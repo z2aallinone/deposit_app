@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 
 class AddDepositScreen extends StatefulWidget {
-  final Map<String, dynamic>? deposit;
-
-  const AddDepositScreen({super.key, this.deposit});
+  const AddDepositScreen({super.key});
 
   @override
   State<AddDepositScreen> createState() => _AddDepositScreenState();
@@ -37,21 +35,6 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
   DateTime? maturityDate;
 
   String depositType = "FD";
-  String? bankName;
-  String? depositor;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.deposit != null) {
-      bankName = widget.deposit!['bankName'];
-      depositor = widget.deposit!['depositor'];
-
-      amountController.text = widget.deposit!['amount'].toString();
-      interestController.text = widget.deposit!['interestRate'].toString();
-    }
-  }
 
   Future<void> pickDate(BuildContext context, bool isStartDate) async {
     DateTime? picked = await showDatePicker(
@@ -304,12 +287,6 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                                   'yearlyInterest': yearlyInterest,
                                   'maturityDate': maturityDate?.toString(),
                                 };
-                                if (widget.deposit != null) {
-                                  await DatabaseHelper.instance.updateDeposit(
-                                    widget.deposit!['id'],
-                                    depositData,
-                                  );
-                                }
                                 await DatabaseHelper.instance.insertDeposit(
                                   depositData,
                                 );
