@@ -57,6 +57,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> dashboardCards = [];
+    List<Widget> dashboardUserCards = [];
+
+    if (bankTotals.isNotEmpty) {
+      for (var bank in bankTotals) {
+        dashboardCards.add(
+          dashboardCard(
+            title: "Bank: ${bank['bankName']}",
+            amount: "₹${bank['total']}",
+            icon: Icons.account_balance,
+            gradient: [
+              const Color.fromARGB(255, 164, 76, 180),
+              const Color.fromARGB(255, 82, 51, 168),
+            ],
+          ),
+        );
+      }
+    }
+
+    if (userTotals.isNotEmpty) {
+      for (var user in userTotals) {
+        dashboardUserCards.add(
+          dashboardCard(
+            title: "User: ${user['depositor']}",
+            amount: "₹${user['total']}",
+            icon: Icons.person,
+            gradient: [Colors.indigo, Colors.indigoAccent],
+          ),
+        );
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text("Deposit Tracker")),
 
@@ -65,58 +97,55 @@ class _HomeScreenState extends State<HomeScreen> {
 
         child: Column(
           children: [
-            Card(
-              child: ListTile(
-                title: const Text("Total Principal"),
-                trailing: Text("₹$totalPrincipal"),
+            SizedBox(
+              height: 140,
+              child: PageView(
+                controller: PageController(viewportFraction: 0.9),
+                padEnds: false,
+                children: [
+                  dashboardCard(
+                    title: "Total Principal",
+                    amount: "₹$totalPrincipal",
+                    icon: Icons.account_balance_wallet,
+                    gradient: [Colors.blue, Colors.blueAccent],
+                  ),
+                  dashboardCard(
+                    title: "Total FD",
+                    amount: "₹$totalFD",
+                    icon: Icons.savings,
+                    gradient: [Colors.green, Colors.teal],
+                  ),
+                  dashboardCard(
+                    title: "Total RD",
+                    amount: "₹$totalRD",
+                    icon: Icons.trending_up,
+                    gradient: [Colors.orange, Colors.deepOrange],
+                  ),
+                ],
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Total per Bank",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-
-            ...bankTotals.map((bank) {
-              return ListTile(
-                title: Text(bank['bankName']),
-                trailing: Text("₹${bank['total']}"),
-              );
-            }),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Total per User",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-
-            ...userTotals.map((user) {
-              return ListTile(
-                title: Text(user['depositor']),
-                trailing: Text("₹${user['total']}"),
-              );
-            }),
-
-            Card(
-              child: ListTile(
-                title: const Text("Total FD"),
-                trailing: Text("₹$totalFD"),
+            SizedBox(
+              height: 140,
+              child: PageView.builder(
+                controller: PageController(viewportFraction: 0.9),
+                padEnds: false,
+                itemCount: dashboardCards.length,
+                itemBuilder: (context, index) {
+                  return dashboardCards[index];
+                },
               ),
             ),
-
-            const SizedBox(height: 10),
-
-            Card(
-              child: ListTile(
-                title: const Text("Total RD"),
-                trailing: Text("₹$totalRD"),
+            SizedBox(
+              height: 140,
+              child: PageView.builder(
+                controller: PageController(viewportFraction: 0.9),
+                padEnds: false,
+                itemCount: dashboardUserCards.length,
+                itemBuilder: (context, index) {
+                  return dashboardUserCards[index];
+                },
               ),
             ),
-
-            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -152,4 +181,55 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+Widget dashboardCard({
+  required String title,
+  required String amount,
+  required IconData icon,
+  required List<Color> gradient,
+}) {
+  return Container(
+    // width: 150,
+    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(16),
+      gradient: LinearGradient(
+        colors: gradient,
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+
+              const SizedBox(height: 8),
+
+              Text(
+                amount,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          Icon(icon, size: 40, color: Colors.white70),
+        ],
+      ),
+    ),
+  );
 }
