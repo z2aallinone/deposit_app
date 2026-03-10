@@ -3,6 +3,7 @@ import 'database/database_helper.dart';
 import 'screens/add_deposit_screen.dart';
 import 'screens/view_deposits_screen.dart';
 import 'services/excel_import_service.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const DepositTrackerApp());
@@ -55,6 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  final formatter = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: '₹',
+    decimalDigits: 0,
+  );
+
   @override
   Widget build(BuildContext context) {
     List<Widget> dashboardCards = [];
@@ -65,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
         dashboardCards.add(
           dashboardCard(
             title: "Bank: ${bank['bankName']}",
-            amount: "₹${bank['total']}",
+            amount: formatter.format(bank['total']),
             icon: Icons.account_balance,
             gradient: [
               const Color.fromARGB(255, 164, 76, 180),
@@ -105,19 +112,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   dashboardCard(
                     title: "Total Principal",
-                    amount: "₹$totalPrincipal",
+                    amount: formatter.format(totalPrincipal),
                     icon: Icons.account_balance_wallet,
                     gradient: [Colors.blue, Colors.blueAccent],
                   ),
                   dashboardCard(
                     title: "Total FD",
-                    amount: "₹$totalFD",
+                    amount: formatter.format(totalFD),
                     icon: Icons.savings,
                     gradient: [Colors.green, Colors.teal],
                   ),
                   dashboardCard(
                     title: "Total RD",
-                    amount: "₹$totalRD",
+                    amount: formatter.format(totalRD),
                     icon: Icons.trending_up,
                     gradient: [Colors.orange, Colors.deepOrange],
                   ),
