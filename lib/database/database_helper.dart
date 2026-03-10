@@ -84,6 +84,18 @@ class DatabaseHelper {
     return await db.query('deposits');
   }
 
+  Future<int> updateDeposit(int id, Map<String, dynamic> deposit) async {
+    final db = await instance.database;
+
+    return await db.update(
+      'deposits',
+      deposit,
+      where: 'id = ?',
+      whereArgs: [id],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<int> deleteDeposit(int id) async {
     final db = await instance.database;
 

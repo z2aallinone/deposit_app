@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 
 class AddDepositScreen extends StatefulWidget {
-  const AddDepositScreen({super.key});
+  final Map<String, dynamic>? deposit;
+
+  const AddDepositScreen({super.key, this.deposit});
 
   @override
   State<AddDepositScreen> createState() => _AddDepositScreenState();
@@ -35,6 +37,21 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
   DateTime? maturityDate;
 
   String depositType = "FD";
+  String? bankName;
+  String? depositor;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.deposit != null) {
+      bankName = widget.deposit!['bankName'];
+      depositor = widget.deposit!['depositor'];
+
+      amountController.text = widget.deposit!['amount'].toString();
+      interestController.text = widget.deposit!['interestRate'].toString();
+    }
+  }
 
   Future<void> pickDate(BuildContext context, bool isStartDate) async {
     DateTime? picked = await showDatePicker(
@@ -277,7 +294,7 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                               }
 
                               try {
-                                await DatabaseHelper.instance.insertDeposit({
+                                var depositData = {
                                   'bankName': selectedBank,
                                   'depositor': selectedName,
                                   'depositType': depositType,
@@ -286,7 +303,16 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                                   'interestRate': interestController.text,
                                   'yearlyInterest': yearlyInterest,
                                   'maturityDate': maturityDate?.toString(),
-                                });
+                                };
+                                if (widget.deposit != null) {
+                                  await DatabaseHelper.instance.updateDeposit(
+                                    widget.deposit!['id'],
+                                    depositData,
+                                  );
+                                }
+                                await DatabaseHelper.instance.insertDeposit(
+                                  depositData,
+                                );
 
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -305,8 +331,6 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                                     ),
                                   );
                                 } else {
-                                  print(e);
-                                  print(stackTrace);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text("Error: $e")),
                                   );

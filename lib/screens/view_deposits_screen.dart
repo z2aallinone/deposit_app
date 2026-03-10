@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
+import 'add_deposit_screen.dart';
 
 class ViewDepositsScreen extends StatefulWidget {
   const ViewDepositsScreen({super.key});
@@ -97,12 +98,39 @@ class _ViewDepositsScreenState extends State<ViewDepositsScreen> {
                       ],
                     ),
 
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        confirmDelete(deposit['id']);
-                      },
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    AddDepositScreen(deposit: deposit),
+                              ),
+                            );
+
+                            loadDeposits();
+                          },
+                        ),
+
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            deleteDeposit(deposit['id']);
+                          },
+                        ),
+                      ],
                     ),
+
+                    // trailing: IconButton(
+                    //   icon: const Icon(Icons.delete, color: Colors.red),
+                    //   onPressed: () {
+                    //     confirmDelete(deposit['id']);
+                    //   },
+                    // ),
                   ),
                 );
               },
