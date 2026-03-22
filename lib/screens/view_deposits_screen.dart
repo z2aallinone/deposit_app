@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
+import 'add_deposit_screen.dart';
 
 class ViewDepositsScreen extends StatefulWidget {
   const ViewDepositsScreen({super.key});
@@ -106,8 +107,7 @@ class _ViewDepositsScreenState extends State<ViewDepositsScreen> {
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    AddDepositScreen(deposit: deposit),
+                                builder: (_) => AddDepositScreen(),
                               ),
                             );
 
