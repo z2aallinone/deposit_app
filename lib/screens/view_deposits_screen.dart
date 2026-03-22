@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
-import 'add_deposit_screen.dart';
 
 class ViewDepositsScreen extends StatefulWidget {
   const ViewDepositsScreen({super.key});
