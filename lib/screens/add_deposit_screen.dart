@@ -226,6 +226,26 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              double amount =
+                                  double.tryParse(amountController.text) ?? 0;
+                              bool isDuplicate = await DatabaseHelper.instance
+                                  .isDuplicateDeposit(
+                                    selectedName!,
+                                    selectedBank!,
+                                    amount,
+                                  );
+
+                              if (isDuplicate) {
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Duplicate deposit found!"),
+                                  ),
+                                );
+                                return;
+                              }
+
                               if (selectedBank == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -239,18 +259,6 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text("Please select a name"),
-                                  ),
-                                );
-                                return;
-                              }
-                              double? amount = double.tryParse(
-                                amountController.text,
-                              );
-
-                              if (amount == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Invalid amount"),
                                   ),
                                 );
                                 return;

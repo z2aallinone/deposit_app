@@ -104,4 +104,20 @@ class DatabaseHelper {
 
     return result.first['total'] as double;
   }
+
+  Future<bool> isDuplicateDeposit(
+    String name,
+    String bankName,
+    double amount,
+  ) async {
+    final db = await instance.database;
+
+    final result = await db.query(
+      'deposits',
+      where: 'depositor = ? AND bankName = ? AND amount = ?',
+      whereArgs: [name, bankName, amount],
+    );
+
+    return result.isNotEmpty;
+  }
 }
