@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double totalFD = 0;
   double totalRD = 0;
   double totalPrincipal = 0;
+  bool isRefreshing = false;
 
   List<Map<String, dynamic>> bankTotals = [];
   List<Map<String, dynamic>> userTotals = [];
@@ -175,17 +176,52 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddDepositScreen()),
-          );
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 🔄 Refresh Button
+          FloatingActionButton(
+            heroTag: "refresh",
+            backgroundColor: isRefreshing ? Colors.grey : Colors.green,
+            child: isRefreshing
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  )
+                : const Icon(Icons.refresh),
+            onPressed: () async {
+              setState(() {
+                isRefreshing = true;
+              });
 
-          loadTotals();
-        },
+              await Future.delayed(
+                const Duration(seconds: 1),
+              ); // small animation time
+              await loadTotals();
+
+              setState(() {
+                isRefreshing = false;
+              });
+            },
+          ),
+
+          const SizedBox(height: 10),
+
+          // ➕ Add Deposit Button
+          FloatingActionButton(
+            heroTag: "add",
+            backgroundColor: Colors.blue,
+            child: const Icon(Icons.add),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AddDepositScreen()),
+              );
+
+              loadTotals();
+            },
+          ),
+        ],
       ),
     );
   }
