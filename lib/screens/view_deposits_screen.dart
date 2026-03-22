@@ -120,17 +120,11 @@ class _ViewDepositsScreenState extends State<ViewDepositsScreen> {
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
                             deleteDeposit(deposit['id']);
+                            loadDeposits();
                           },
                         ),
                       ],
                     ),
-
-                    // trailing: IconButton(
-                    //   icon: const Icon(Icons.delete, color: Colors.red),
-                    //   onPressed: () {
-                    //     confirmDelete(deposit['id']);
-                    //   },
-                    // ),
                   ),
                 );
               },

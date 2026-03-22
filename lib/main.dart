@@ -159,6 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   MaterialPageRoute(builder: (_) => const ViewDepositsScreen()),
                 );
+                loadTotals();
               },
               child: const Text("View Deposits"),
             ),
